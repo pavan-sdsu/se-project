@@ -11,10 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @RestController
 public class ReservationService {
@@ -100,7 +97,7 @@ public class ReservationService {
 
 
 	@Transactional
-	@PostMapping("/checkIn")
+	@PostMapping("/checkInUser")
 	public Response checkIn(@RequestBody HashMap body) {
 		Response res = new Response();
 
@@ -121,7 +118,7 @@ public class ReservationService {
 	}
 
 	@Transactional
-	@PostMapping("/checkOut")
+	@PostMapping("/checkOutUser")
 	public Response checkOut(@RequestBody HashMap body) {
 		Response res = new Response();
 
@@ -223,6 +220,160 @@ public class ReservationService {
 		return res;
 	}
 
+
+	@Transactional
+	@PostMapping("/changeResDate")
+	public Response changeResDate(@RequestBody HashMap body) {
+		Response res = new Response();
+
+		int rid = (int) body.get("rId");
+		String fromDate = (String) body.get("fromDate");
+		String toDate = (String) body.get("toDate");
+
+		String[] cols = {"rId","userId","bookingTime","startDate","endDate","roomNo","checkinTime","checkoutTime","baseRate","amountPaid","totalAmount","reservationType","lastPaymentTime","lastModifiedTime","comments","status"};
+
+		String colString = Arrays.toString(cols).replaceAll("\\[|\\]", "");
+
+		List li = entityManager.createNativeQuery("SELECT " + colString + " from reservations where rid = " + rid + " AND status='active'").getResultList();
+
+		if(li.size() == 0) {
+			res.setData("No reservation found!");
+			return res;
+		}
+
+		final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
+		int updateRes = entityManager.createNativeQuery("UPDATE reservations SET status='inactive', lastModifiedTime = '" + timestamp + "' WHERE rid=" + rid + " AND status='active'").executeUpdate();
+
+		if (updateRes == 0) {
+			res.setData("Reservation not set inactive");
+			return res;
+		}
+
+		Object[] updatedValues = (Object[]) li.get(0);
+		updatedValues[updatedValues.length-3] = timestamp.toString();
+		updatedValues[3] = fromDate;
+		updatedValues[4] = toDate;
+
+		StringBuilder updatedValuesString = new StringBuilder("");
+		for (int i = 0; i < updatedValues.length; i++) updatedValuesString.append("'" + updatedValues[i] + "',");
+
+
+		String updateSqlString = "INSERT INTO reservations (" + colString + ") VALUES (" + updatedValuesString.substring(0, updatedValuesString.length()-1) + ")";
+		updateRes = entityManager.createNativeQuery(updateSqlString).executeUpdate();
+
+		if (updateRes == 0) {
+			res.setData("No reservation inserted");
+			return res;
+		}
+
+		res.setSuccess(1);
+		res.setData("Changed date successfully");
+
+		return res;
+	}
+
+
+
+	/* USER QUERIES */
+	@Transactional
+	@PostMapping("/getUserDetails")
+	public Response getUserDetails(@RequestBody HashMap body) {
+		Response res = new Response();
+
+		String[] userCols = {"userId","firstName","lastName","dob","phoneNumber","email","addressLine1","addressLine2","city","state","country","zip","ccNo"};
+		String userColsString = Arrays.toString(userCols).replaceAll("\\[|\\]", "");
+
+		final String email = (String) body.get("email");
+
+		List li = entityManager.createNativeQuery("SELECT " + userColsString + " FROM user WHERE email = '" + email + "'").getResultList();
+
+		if (li.size() == 0) {
+			int insertRes = entityManager.createNativeQuery("INSERT INTO user (email) VALUES ('" + email + "')").executeUpdate();
+
+			if (insertRes == 0) {
+				res.setData("Could not create a new user");
+				return res;
+			}
+
+			li = entityManager.createNativeQuery("SELECT " + userColsString + " FROM user WHERE email = '" + email + "'").getResultList();
+		}
+
+		HashMap data = new HashMap();
+		Object[] o = (Object[]) li.get(0);
+		for (int i = 0; i < userCols.length; i++) {
+			data.put(userCols[i], o[i]);
+		}
+
+		res.setSuccess(1);
+		res.setData(data);
+
+		return res;
+	}
+
+
+	@Transactional
+	@PostMapping("/checkout")
+	public Response checkout(@RequestBody HashMap body) {
+		Response res = new Response();
+
+		HashMap<String, Object> user = (HashMap) body.get("user");
+		HashMap<String, Object> reservation = (HashMap) body.get("reservation");
+
+		String[] reservationCols = new String[reservation.keySet().size() + 2];
+		String[] reservationVals = new String[reservation.keySet().size() + 2];
+
+		int i = 0;
+
+		final int userId = (int) user.get("userId");
+		user.remove("userId");
+
+		StringBuilder userVals = new StringBuilder("");
+		for (Map.Entry e: user.entrySet()) {
+			userVals.append(e.getKey() + "='" + e.getValue() + "',");
+			i++;
+		}
+
+		int updateRes = entityManager.createNativeQuery("UPDATE user SET " + userVals.substring(0, userVals.length() - 1) + " WHERE userId = " + userId).executeUpdate();
+		if (updateRes == 0) {
+			res.setData("User not updated");
+			return res;
+		}
+
+		i = 0;
+		for (Map.Entry e: reservation.entrySet()) {
+			reservationCols[i] = (String) e.getKey();
+			reservationVals[i] = "'" + e.getValue() + "'";
+			i++;
+		}
+
+//		set user id
+		reservationCols[i] = "userId";
+		reservationVals[i] = "'" + userId + "'";
+		i++;
+
+//		set reservation id
+		reservationCols[i] = "rId";
+		reservationVals[i] = "(SELECT MAX(rId) FROM reservations r) + 1";
+
+		String sql = "INSERT INTO reservations (" + colsToString(reservationCols) + ") VALUES (" + colsToString(reservationVals) + ")";
+		System.out.println();
+		updateRes = entityManager.createNativeQuery(sql).executeUpdate();
+		if (updateRes == 0) {
+			res.setData("Reservation not added");
+			return res;
+		}
+
+		res.setSuccess(1);
+		res.setData("Reservation added successfully");
+
+		return res;
+	}
+
+
+	private String colsToString(String[] cols) {
+		return Arrays.toString(cols).replaceAll("\\[|\\]", "");
+	}
 
 
 }
