@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.*;
@@ -371,9 +372,150 @@ public class ReservationService {
 	}
 
 
+	@Transactional
+	@PostMapping("/makePayment")
+	public Response makePayment(@RequestBody HashMap body) {
+		Response res = new Response();
+
+		final int rId = (int) body.get("rId");
+		final String ccNo = (String) body.get("ccNo");
+
+		int updateRes = entityManager.createNativeQuery("UPDATE user u INNER JOIN reservations r ON u.userId = r.userId SET u.ccNo=" + ccNo + " WHERE r.rId = " + rId + " AND r.status = 'active'").executeUpdate();
+
+		if (updateRes == 0) {
+			res.setData("Credit card not added to user");
+			return res;
+		}
+
+		updateRes = entityManager.createNativeQuery("UPDATE reservations SET amountPaid = totalAmount WHERE rId = " + rId + " AND status='active'").executeUpdate();
+
+		if (updateRes == 0) {
+			res.setData("Reservations not updated");
+			return res;
+		}
+
+		res.setSuccess(1);
+		res.setData("Amount paid successfully");
+		return res;
+	}
+
+
+	@Transactional
+	@PostMapping("/getBooking")
+	public Response getBooking(@RequestBody HashMap body) {
+		Response res = new Response();
+
+		int rId = (int) body.get("rId");
+		String email = "'" + body.get("email") + "'";
+		String dob = "'" + body.get("dob") + "'" ;
+
+		String[] cols = {"r.rId", "r.userId", "r.bookingTime", "r.startDate", "r.endDate", "r.baseRate", "r.amountPaid", "r.totalAmount", "r.reservationType", "u.firstName", "u.lastName"};
+
+		List li = entityManager.createNativeQuery("SELECT " + colsToString(cols) + " FROM reservations r INNER JOIN user u ON r.userId = u.userId WHERE r.rId = " + rId + " AND u.email = " + email + " AND u.dob = " + dob + " AND r.status = 'active'").getResultList();
+
+		if (li.size() == 0) {
+			res.setData("No reservation found!");
+			return res;
+		}
+
+		Object[] values = (Object[]) li.get(0);
+		HashMap hm = new HashMap();
+		for (int i = 0; i < cols.length; i++) hm.put(cols[i].split("\\.")[1], values[i]);
+
+		res.setData(hm);
+		res.setSuccess(1);
+
+		return res;
+	}
+
+
+	@Transactional
+	@PostMapping("/expOccupancyReport")
+	public Response expOccupancyReport(@RequestBody HashMap body) {
+		Response res = new Response();
+
+		LocalDate startDate = LocalDate.parse((String) body.get("date"));
+		LocalDate endDate = startDate.plusDays(30);
+
+		List li = entityManager.createNativeQuery("SELECT COUNT(*) AS count, reservationType, startDate FROM reservations WHERE startDate BETWEEN '" + startDate + "' AND '" + endDate + "' AND endDate BETWEEN '" + startDate + "' AND '" + endDate + "' AND status='active' GROUP BY reservationType, startDate ORDER BY startDate;").getResultList();
+
+		if (li.size() == 0) {
+			res.setData("No data found");
+			return res;
+		}
+
+		HashMap<Object, List> organizing = new HashMap<>();
+		for (int i = 0; i < li.size(); i++) {
+			Object[] o = (Object[]) li.get(i);
+			List al;
+			final Object date = o[2];
+			if (organizing.containsKey(date)) {
+				al = organizing.get(date);
+			} else {
+				al = Arrays.asList(0, 0, 0, 0);
+			}
+
+			final String reservationType = String.valueOf(o[1]);
+			final int count = ((BigInteger) o[0]).intValue();
+
+			if (reservationType.equals("prepaid")) al.set(0, count);
+			else if (reservationType.equals("sixtyDays")) al.set(1, count);
+			else if (reservationType.equals("conventional")) al.set(2, count);
+			else al.set(3, count);
+
+			organizing.put(date, al);
+		}
+
+
+		HashMap[] arr = new HashMap[organizing.size()];
+		int i = 0;
+		float[] occRates = new float[organizing.size()];
+		for (Map.Entry e: organizing.entrySet()) {
+			HashMap hm = new HashMap();
+			List<Integer> al = (List<Integer>) e.getValue();
+
+			hm.put("date", e.getKey());
+			hm.put("prepaid", al.get(0));
+			hm.put("sixtyDays", al.get(1));
+			hm.put("conventional", al.get(2));
+			hm.put("incentive", al.get(3));
+
+			arr[i] = hm;
+			occRates[i] = ((al.get(0) + al.get(1) + al.get(2) + al.get(3)) / (float)45);
+
+			i++;
+		}
+
+		float sum = 0;
+		for (i = 0; i < occRates.length; i++) sum += occRates[i] * 100;
+
+		HashMap data = new HashMap();
+		data.put("occupancy", arr);
+		data.put("averageOccupancy", (sum/occRates.length));
+
+		res.setSuccess(1);
+		res.setData(data);
+
+		return res;
+	}
+
+
+
+	@Transactional
+	@PostMapping("/incentiveReport")
+	public Response incentiveReport(@RequestBody HashMap body) {
+		Response res = new Response();
+
+		LocalDate startDate = LocalDate.parse((String) body.get("date"));
+		LocalDate endDate = startDate.plusDays(30);
+
+		return res;
+	}
+
+
+	/* Utility methods */
 	private String colsToString(String[] cols) {
 		return Arrays.toString(cols).replaceAll("\\[|\\]", "");
 	}
-
 
 }

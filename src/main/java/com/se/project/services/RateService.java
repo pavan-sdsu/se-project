@@ -23,6 +23,7 @@ public class RateService {
 	@PersistenceContext
 	private EntityManager entityManager;
 
+
 	@PostMapping("/getRate")
 	public Response getRate(@RequestBody HashMap body) {
 		Response response = new Response();
@@ -63,6 +64,7 @@ public class RateService {
 		return response;
 	}
 
+
 	@Transactional
 	@PostMapping("/setBaseRate")
 	public Response setBaseRate(@RequestBody HashMap body) {
@@ -83,6 +85,7 @@ public class RateService {
 
 		return res;
 	}
+
 
 	@Transactional
 	@PostMapping("/updateBaseRate")
@@ -124,6 +127,16 @@ public class RateService {
 		return res;
 	}
 
+
+	@Transactional
+	@PostMapping("/calcAmount")
+	public Response calcAmount(@RequestBody HashMap body) {
+		Response res = new Response();
+
+//		TODO: Complete this
+
+		return res;
+	}
 
 
 	private String getListOfRates(HashMap body, @Nullable Timestamp timestamp) {
