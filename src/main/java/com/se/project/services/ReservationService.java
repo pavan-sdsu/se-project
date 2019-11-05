@@ -277,6 +277,7 @@ public class ReservationService {
 
 
 	/* USER QUERIES */
+	/* TODO: Remove it */
 	@Transactional
 	@PostMapping("/getUserDetails")
 	public Response getUserDetails(@RequestBody HashMap body) {
