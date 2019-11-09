@@ -178,7 +178,6 @@ public class ReservationService {
 	@Transactional
 	@PostMapping("/getAvailableRooms")
 	public Response getAvailableRooms(@RequestBody HashMap body) {
-		/* TODO: Add leading zeros to roomNos */
 		Response res = new Response();
 
 		String[] roomsArr = {
@@ -188,7 +187,7 @@ public class ReservationService {
 			"031","032","033","034","035","036","037","038","039","040",
 			"041","042","043","044","045"
 		};
-		List totalRooms = Arrays.asList(roomsArr);
+		List totalRooms = new ArrayList(Arrays.asList(roomsArr));
 
 		String date = (String) body.get("date");
 		List li = entityManager.createNativeQuery("SELECT roomNo FROM reservations WHERE startDate='" + date + "' AND status = 'active'").getResultList();

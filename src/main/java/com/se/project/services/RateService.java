@@ -70,6 +70,16 @@ public class RateService {
 	public Response setBaseRate(@RequestBody HashMap body) {
 		Response res = new Response();
 
+		String startDate = "'" + body.get("fromDate") + "'";
+		String endDate = "'" + body.get("toDate") + "'";
+
+		String sql = "SELECT date FROM rate WHERE date BETWEEN " + startDate + " AND " + endDate+ " AND status = 'active'";
+		List exisitingVals = entityManager.createNativeQuery(sql).getResultList();
+		if (exisitingVals.size() > 0) {
+			res.setData("Rates already set for following dates " + exisitingVals.toString());
+			return res;
+		}
+
 		String dateStr = getListOfRates(body, null);
 		int insertRes = entityManager.createNativeQuery("INSERT INTO rate(date, baseRate, createdBy, createdTime) VALUES " + dateStr)
 				.executeUpdate();
