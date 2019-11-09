@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.math.BigInteger;
+import java.sql.Array;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.*;
@@ -28,9 +29,9 @@ public class ReservationService {
 
 		String date = (String) body.get("date");
 
-		String[] cols = {"r.rid", "u.firstName", "r.startDate", "r.endDate", "r.roomNo", "r.baseRate", "r.amountPaid", "r.totalAmount", "r.reservationType"};
+		String[] cols = {"r.rid", "u.firstName", "r.startDate", "r.endDate", "r.noRooms", "r.roomNo", "r.amountPaid", "r.totalAmount", "r.reservationType"};
 
-		String query = "SELECT " + Arrays.toString(cols).replaceAll("\\[|\\]", "") + " FROM reservations r INNER JOIN user u ON r.userId = u.userId WHERE startDate <='" + date + "' AND endDate >= '" + date + "' and status='active'";
+		String query = "SELECT " + colsToString(cols) + " FROM reservations r INNER JOIN user u ON r.userId = u.userId WHERE startDate <='" + date + "' AND endDate >= '" + date + "' and status='active'";
 		List li = entityManager.createNativeQuery(query).getResultList();
 
 		if(li.size() == 0) {
@@ -76,14 +77,13 @@ public class ReservationService {
 		return res;
 	}
 
-
 	@Transactional
 	@PostMapping("/allocateRoom")
 	public Response allocateRoom(@RequestBody HashMap body) {
 		Response res = new Response();
 
 		int rid = (int) body.get("rid");
-		int roomNo = (int) body.get("roomNo");
+		String roomNo = "'" + body.get("roomNo") + "'";
 
 		int updateRes = entityManager.createNativeQuery("UPDATE reservations SET roomNo = " + roomNo + " WHERE rId = " + rid + " AND status = 'active';").executeUpdate();
 
@@ -97,7 +97,6 @@ public class ReservationService {
 
 		return res;
 	}
-
 
 	@Transactional
 	@PostMapping("/checkInUser")
@@ -152,7 +151,7 @@ public class ReservationService {
 
 		String[] cols = {"r.rid", "r.startDate", "u.firstName", "u.lastName", "u.email", "u.phoneNumber"};
 
-		List li = entityManager.createNativeQuery("SELECT " + Arrays.toString(cols).replaceAll("\\[|\\]", "")  + " FROM reservations r INNER JOIN user u ON r.userId = u.userId WHERE r.startDate = '" + after + "' AND r.status = 'active' AND r.reservationType = 'sixtyDays'").getResultList();
+		List li = entityManager.createNativeQuery("SELECT " + colsToString(cols) + " FROM reservations r INNER JOIN user u ON r.userId = u.userId WHERE r.startDate = '" + after + "' AND r.status = 'active' AND r.reservationType = 'sixtyDays'").getResultList();
 
 		if(li.size() == 0) {
 			res.setData("No data found");
@@ -176,20 +175,29 @@ public class ReservationService {
 		return res;
 	}
 
-
 	@Transactional
 	@PostMapping("/getAvailableRooms")
 	public Response getAvailableRooms(@RequestBody HashMap body) {
 		/* TODO: Add leading zeros to roomNos */
 		Response res = new Response();
 
-		List totalRooms = new ArrayList();
-		for (int i = 0; i < 45; i++) totalRooms.add(i);
+		String[] roomsArr = {
+			"001","002","003","004","005","006","007","008","009","010",
+			"011","012","013","014","015","016","017","018","019","020",
+			"021","022","023","024","025","026","027","028","029","030",
+			"031","032","033","034","035","036","037","038","039","040",
+			"041","042","043","044","045"
+		};
+		List totalRooms = Arrays.asList(roomsArr);
 
 		String date = (String) body.get("date");
 		List li = entityManager.createNativeQuery("SELECT roomNo FROM reservations WHERE startDate='" + date + "' AND status = 'active'").getResultList();
 
-		totalRooms.removeAll(li);
+		for (int i = 0; i < li.size(); i++) {
+			String[] rooms = ((String) li.get(i)).split(",");
+			totalRooms.removeAll(Arrays.asList(rooms));
+		}
+
 
 		if (totalRooms.size() == 0) {
 			res.setData("No rooms available");
@@ -201,7 +209,6 @@ public class ReservationService {
 
 		return res;
 	}
-
 
 	@Transactional
 	@PostMapping("/payBill")
@@ -233,11 +240,9 @@ public class ReservationService {
 		String fromDate = (String) body.get("fromDate");
 		String toDate = (String) body.get("toDate");
 
-		String[] cols = {"rId","userId","bookingTime","startDate","endDate","roomNo","checkinTime","checkoutTime","baseRate","amountPaid","totalAmount","reservationType","lastPaymentTime","lastModifiedTime","comments","status"};
+		String[] cols = {"rId","userId","bookingTime","startDate","endDate","roomNo","checkinTime","checkoutTime","amountPaid","totalAmount","reservationType","lastPaymentTime","lastModifiedTime","comments","status"};
 
-		String colString = Arrays.toString(cols).replaceAll("\\[|\\]", "");
-
-		List li = entityManager.createNativeQuery("SELECT " + colString + " from reservations where rid = " + rid + " AND status='active'").getResultList();
+		List li = entityManager.createNativeQuery("SELECT " + colsToString(cols) + " from reservations where rid = " + rid + " AND status='active'").getResultList();
 
 		if(li.size() == 0) {
 			res.setData("No reservation found!");
@@ -262,7 +267,7 @@ public class ReservationService {
 		for (int i = 0; i < updatedValues.length; i++) updatedValuesString.append("'" + updatedValues[i] + "',");
 
 
-		String updateSqlString = "INSERT INTO reservations (" + colString + ") VALUES (" + updatedValuesString.substring(0, updatedValuesString.length()-1) + ")";
+		String updateSqlString = "INSERT INTO reservations (" + colsToString(cols) + ") VALUES (" + updatedValuesString.substring(0, updatedValuesString.length()-1) + ")";
 		updateRes = entityManager.createNativeQuery(updateSqlString).executeUpdate();
 
 		if (updateRes == 0) {
@@ -421,9 +426,11 @@ public class ReservationService {
 		String email = "'" + body.get("email") + "'";
 		String dob = "'" + body.get("dob") + "'" ;
 
-		String[] cols = {"r.rId", "r.userId", "r.bookingTime", "r.startDate", "r.endDate", "r.baseRate", "r.amountPaid", "r.totalAmount", "r.reservationType", "u.firstName", "u.lastName"};
+		String[] cols = {"r.rId", "r.userId", "r.bookingTime", "r.startDate", "r.endDate", "r.amountPaid", "r.totalAmount", "r.reservationType", "u.firstName", "u.lastName"};
 
-		List li = entityManager.createNativeQuery("SELECT " + colsToString(cols) + " FROM reservations r INNER JOIN user u ON r.userId = u.userId WHERE r.rId = " + rId + " AND u.email = " + email + " AND u.dob = " + dob + " AND r.status = 'active'").getResultList();
+		String sql = "SELECT " + colsToString(cols) + " FROM reservations r INNER JOIN user u ON r.userId = u.userId WHERE r.rId = " + rId + " AND u.email = " + email + " AND u.dob = " + dob + " AND r.status = 'active'";
+
+		List li = entityManager.createNativeQuery(sql).getResultList();
 
 		if (li.size() == 0) {
 			res.setData("No reservation found!");
