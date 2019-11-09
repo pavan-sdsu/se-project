@@ -14,6 +14,8 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.*;
 
+import static java.time.temporal.ChronoUnit.DAYS;
+
 @RestController
 public class ReservationService {
 
@@ -277,43 +279,6 @@ public class ReservationService {
 
 
 	/* USER QUERIES */
-	/* TODO: Remove it */
-	@Transactional
-	@PostMapping("/getUserDetails")
-	public Response getUserDetails(@RequestBody HashMap body) {
-		Response res = new Response();
-
-		String[] userCols = {"userId","firstName","lastName","dob","phoneNumber","email","addressLine1","addressLine2","city","state","country","zip","ccNo"};
-		String userColsString = Arrays.toString(userCols).replaceAll("\\[|\\]", "");
-
-		final String email = (String) body.get("email");
-
-		List li = entityManager.createNativeQuery("SELECT " + userColsString + " FROM user WHERE email = '" + email + "'").getResultList();
-
-		if (li.size() == 0) {
-			int insertRes = entityManager.createNativeQuery("INSERT INTO user (email) VALUES ('" + email + "')").executeUpdate();
-
-			if (insertRes == 0) {
-				res.setData("Could not create a new user");
-				return res;
-			}
-
-			li = entityManager.createNativeQuery("SELECT " + userColsString + " FROM user WHERE email = '" + email + "'").getResultList();
-		}
-
-		HashMap data = new HashMap();
-		Object[] o = (Object[]) li.get(0);
-		for (int i = 0; i < userCols.length; i++) {
-			data.put(userCols[i], o[i]);
-		}
-
-		res.setSuccess(1);
-		res.setData(data);
-
-		return res;
-	}
-
-
 	@Transactional
 	@PostMapping("/checkout")
 	public Response checkout(@RequestBody HashMap body) {
@@ -322,25 +287,32 @@ public class ReservationService {
 		HashMap<String, Object> user = (HashMap) body.get("user");
 		HashMap<String, Object> reservation = (HashMap) body.get("reservation");
 
-		String[] reservationCols = new String[reservation.keySet().size() + 2];
-		String[] reservationVals = new String[reservation.keySet().size() + 2];
+		String[] reservationCols = new String[reservation.keySet().size() + 3];
+		String[] reservationVals = new String[reservation.keySet().size() + 3];
 
 		int i = 0;
 
-		final int userId = (int) user.get("userId");
-		user.remove("userId");
-
-		StringBuilder userVals = new StringBuilder("");
+		String[] userCols = new String[user.keySet().size() + 1];
+		String[] userVals = new String[user.keySet().size() + 1];
 		for (Map.Entry e: user.entrySet()) {
-			userVals.append(e.getKey() + "='" + e.getValue() + "',");
+			userCols[i] = String.valueOf(e.getKey());
+			userVals[i] = "'" + e.getValue() + "'";
 			i++;
 		}
 
-		int updateRes = entityManager.createNativeQuery("UPDATE user SET " + userVals.substring(0, userVals.length() - 1) + " WHERE userId = " + userId).executeUpdate();
+		String userId = String.valueOf(entityManager.createNativeQuery("SELECT MAX(userId) + 1 FROM user").getResultList().get(0));
+		userCols[i] = "userId";
+		userVals[i] = userId;
+
+		String sql = "INSERT INTO user (" + colsToString(userCols) + ") VALUES (" + colsToString(userVals) + ")";
+		int updateRes = entityManager.createNativeQuery(sql).executeUpdate();
 		if (updateRes == 0) {
 			res.setData("User not updated");
 			return res;
 		}
+
+		List uidList = entityManager.createNativeQuery("SELECT MAX(uid) + 1 FROM reservations").getResultList();
+		String uid = String.valueOf(uidList.get(0));
 
 		i = 0;
 		for (Map.Entry e: reservation.entrySet()) {
@@ -357,14 +329,53 @@ public class ReservationService {
 //		set reservation id
 		reservationCols[i] = "rId";
 		reservationVals[i] = "(SELECT MAX(rId) FROM reservations r) + 1";
+		i++;
 
-		String sql = "INSERT INTO reservations (" + colsToString(reservationCols) + ") VALUES (" + colsToString(reservationVals) + ")";
-		System.out.println();
+//		set uid
+		reservationCols[i] = "uid";
+		reservationVals[i] = uid;
+
+		/* INSERT resBaseRates */
+		LocalDate startDate = LocalDate.parse((String) reservation.get("startDate"));
+		LocalDate endDate = LocalDate.parse((String) reservation.get("endDate"));
+
+		/* Get rates for days */
+		List rates = entityManager.createNativeQuery("SELECT baseRate FROM rate WHERE date BETWEEN '" + startDate + "' AND '" + endDate + "' AND status = 'active'").getResultList();
+		StringBuilder resBaseRatesVals = new StringBuilder("");
+
+		endDate = endDate.plusDays(1);
+
+		if(DAYS.between(startDate, endDate) != rates.size()) {
+			res.setData("Base rate not found");
+			return res;
+		}
+
+		int j = 0;
+		while (startDate.isBefore(endDate)) {
+			resBaseRatesVals.append("(" + uid + ", '" + startDate + "', '" + rates.get(j++) + "'),");
+			startDate = startDate.plusDays(1);
+		}
+		/* Get rates for days */
+
+		sql = "INSERT INTO resBaseRates(uid, date, baseRate) VALUES " + resBaseRatesVals.substring(0, resBaseRatesVals.length()-1);
+
+		updateRes = entityManager.createNativeQuery(sql).executeUpdate();
+		if (updateRes == 0) {
+			res.setData("ResBaseRates not added");
+			return res;
+		}
+		/* INSERT resBaseRates */
+
+
+		/* INSERT reservation */
+		sql = "INSERT INTO reservations (" + colsToString(reservationCols) + ") VALUES (" + colsToString(reservationVals) + ")";
 		updateRes = entityManager.createNativeQuery(sql).executeUpdate();
 		if (updateRes == 0) {
 			res.setData("Reservation not added");
 			return res;
 		}
+		/* INSERT reservation */
+
 
 		res.setSuccess(1);
 		res.setData("Reservation added successfully");

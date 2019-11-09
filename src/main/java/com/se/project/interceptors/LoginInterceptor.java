@@ -36,44 +36,30 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-		Map<String, String > map = new HashMap<>();
-		map.put("email", "pavan1645@gmail.com");
-		map.put("password", "pass");
-
-		String encoded="";
 		Algorithm algorithm = Algorithm.HMAC256("secret");
-		try {
-			encoded = JWT.create()
-					.withIssuer("auth0")
-					.withClaim("data", new ObjectMapper().writeValueAsString(map))
-					.sign(algorithm);
-
-		} catch (JWTCreationException exception){
-			System.out.println("Invalid Signing configuration / Couldn't convert Claims.");
-		}
 
 		Map<String, String> headers = Collections
 				.list(request.getHeaderNames())
 				.stream()
 				.collect(Collectors.toMap(h -> h, request::getHeader));
 
-		String token = headers.get("authorization").split(" ")[1];
-
-		DecodedJWT decoded = null;
-		try {
-			JWTVerifier verifier = JWT.require(algorithm)
-					.withIssuer("auth0")
-					.build();
-			decoded = verifier.verify(token);
-		} catch (JWTVerificationException exception){
-			System.out.println("Invalid signature/claims");
+		String auth = headers.get("authorization");
+		if (auth == null) {
+			response.sendError(532, "No token found");
+			return false;
 		}
 
+		String token = auth.split(" ")[1];
 
-		Claim data = decoded.getClaim("data");
-		Map<String, Object> res = new ObjectMapper().readValue(data.asString(), HashMap.class);
+		DecodedJWT decoded = null;
+		JWTVerifier verifier = JWT.require(algorithm).withIssuer("auth0").build();
 
-		System.out.println(res);
+		try {
+			decoded = verifier.verify(token);
+		} catch (JWTVerificationException exception){
+			response.sendError(532, "Invalid login token");
+			return false;
+		}
 
 		return true;
 
