@@ -132,6 +132,7 @@ public class RateService {
 	@PostMapping("/calcAmount")
 	public Response calcAmount(@RequestBody HashMap body) {
 		Response res = new Response();
+		// This is Done by Ronak.
 
 //		TODO: Complete this
 
