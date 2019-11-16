@@ -193,6 +193,7 @@ public class ReservationService {
 		List li = entityManager.createNativeQuery("SELECT roomNo FROM reservations WHERE startDate='" + date + "' AND status = 'active'").getResultList();
 
 		for (int i = 0; i < li.size(); i++) {
+			if(li.get(i) == null) continue;
 			String[] rooms = ((String) li.get(i)).split(",");
 			totalRooms.removeAll(Arrays.asList(rooms));
 		}
