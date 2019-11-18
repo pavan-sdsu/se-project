@@ -384,10 +384,11 @@ public class ReservationService {
 		LocalDate endDate = LocalDate.parse((String) reservation.get("endDate"));
 
 		/* Get rates for days */
-		List rates = entityManager.createNativeQuery("SELECT baseRate FROM rate WHERE date BETWEEN '" + startDate + "' AND '" + endDate + "' AND status = 'active'").getResultList();
+//		List rates = entityManager.createNativeQuery("SELECT baseRate FROM rate WHERE date BETWEEN '" + startDate + "' AND '" + endDate + "' AND status = 'active'").getResultList();
+		List rates = entityManager.createNativeQuery("SELECT baseRate FROM rate WHERE date <'" + endDate + "' AND date >= '" + startDate + "' AND status = 'active'").getResultList();
 		StringBuilder resBaseRatesVals = new StringBuilder("");
 
-		endDate = endDate.plusDays(1);
+//		endDate = endDate.plusDays(1);
 
 		if(DAYS.between(startDate, endDate) != rates.size()) {
 			res.setData("Base rate not found");

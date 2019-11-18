@@ -153,7 +153,8 @@ public class RateService {
 		double sixtyDaysAdv = 0;
 		double conventional = 0;
 
-		String sql = "SELECT date, baserate from rate where date BETWEEN ?1 AND ?2 AND status='active'";
+//		String sql = "SELECT date, baserate from rate where date BETWEEN ?1 AND ?2 AND status='active'";
+		String sql = "SELECT date, baserate from rate where date < ?2 AND date >= ?1 AND status='active'";
 		List li = entityManager.createNativeQuery(sql)
 				.setParameter(1, fromDate)
 				.setParameter(2, toDate)
