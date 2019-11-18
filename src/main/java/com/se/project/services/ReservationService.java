@@ -5,6 +5,7 @@ import com.se.project.models.Response;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.persistence.EntityManager;
@@ -56,6 +57,7 @@ public class ReservationService {
 		return res;
 	}
 
+
 	@Transactional
 	@PostMapping("/cancelReservation")
 	public Response cancelReservation(@RequestBody HashMap body) {
@@ -74,6 +76,43 @@ public class ReservationService {
 		res.setSuccess(1);
 		res.setData("Cancelled reservation successfully");
 
+		return res;
+	}
+
+	@Transactional
+	@PostMapping("/chargePenalty")
+	public Response chargePenalty(@RequestBody HashMap body) {
+		Response res = new Response();
+		String comments = (String) body.get("comment");
+		int rid = (int) body.get("rid");
+		String[] cols = {"r.rid", "rBR.baseRate", "r.amountPaid", "r.reservationType", "r.noRooms"};
+		String query = "SELECT " + colsToString(cols) + " FROM reservations r INNER JOIN resBaseRates rBR ON rBR.uid = r.uid and rBR.date = r.startDate WHERE rId ='" + rid + "' and status='active'";
+		List li = entityManager.createNativeQuery(query).getResultList();
+
+		if(li.size() == 0) {
+			res.setData("No data found");
+			return res;
+		}
+		Object[] rs = (Object[]) li.get(0);
+		HashMap hm = new HashMap();
+		int i = 0;
+		for(String s: cols) {
+			hm.put(s.split("\\.")[1], rs[i++]);
+		}
+		if (hm.get("reservationType") == "conventional" || hm.get("reservationType") == "incentive"){
+			hm.put("amountPaid",(Integer.parseInt(hm.get("baseRate").toString()) * Integer.parseInt(hm.get("noRooms").toString())));
+		}
+		final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		String SQLString = "UPDATE reservations SET amountPaid = '" + hm.get("amountPaid") + "', comments = '" + comments + "', lastPaymentTime = CURRENT_TIMESTAMP, lastModifiedTime = '" + timestamp + "' WHERE rId = '" + rid + "' AND status = 'active'";
+		System.out.println("SQLString-->"+SQLString);
+		int updateRes = entityManager.createNativeQuery(SQLString).executeUpdate();
+
+		if (updateRes == 0) {
+			res.setData("No rows updated");
+			return res;
+		}
+		res.setSuccess(1);
+		res.setData("Penalty charged successfully");
 		return res;
 	}
 
