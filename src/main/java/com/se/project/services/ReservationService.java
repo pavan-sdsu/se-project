@@ -677,7 +677,7 @@ public class ReservationService {
             Object[] rs = (Object[]) o;
             HashMap hm = new HashMap();
             hm.put("date", rs[0]);
-            hm.put("Incentive Discount", rs[1]);
+            hm.put("incentiveDiscount", rs[1]);
             totalDisc = totalDisc + Float.parseFloat(rs[1].toString());
             data.add(hm);
         }
