@@ -83,7 +83,7 @@ public class ReservationService {
 	@PostMapping("/chargePenalty")
 	public Response chargePenalty(@RequestBody HashMap body) {
 		Response res = new Response();
-		String comments = (String) body.get("comment");
+		String comments = "Penalty charged";
 		int rid = (int) body.get("rid");
 		String[] cols = {"r.rid", "rBR.baseRate", "r.amountPaid", "r.reservationType", "r.noRooms"};
 		String query = "SELECT " + colsToString(cols) + " FROM reservations r INNER JOIN resBaseRates rBR ON rBR.uid = r.uid and rBR.date = r.startDate WHERE rId ='" + rid + "' and status='active'";
@@ -99,12 +99,12 @@ public class ReservationService {
 		for(String s: cols) {
 			hm.put(s.split("\\.")[1], rs[i++]);
 		}
-		if (hm.get("reservationType") == "conventional" || hm.get("reservationType") == "incentive"){
-			hm.put("amountPaid",(Integer.parseInt(hm.get("baseRate").toString()) * Integer.parseInt(hm.get("noRooms").toString())));
+		if ("conventional".equals(hm.get("reservationType")) || "incentive".equals(hm.get("reservationType"))){
+		    Float paid_amt = Float.parseFloat(hm.get("baseRate").toString()) * Float.parseFloat(hm.get("noRooms").toString());
+			hm.put("amountPaid",paid_amt);
 		}
 		final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		String SQLString = "UPDATE reservations SET amountPaid = '" + hm.get("amountPaid") + "', comments = '" + comments + "', lastPaymentTime = CURRENT_TIMESTAMP, lastModifiedTime = '" + timestamp + "' WHERE rId = '" + rid + "' AND status = 'active'";
-		System.out.println("SQLString-->"+SQLString);
 		int updateRes = entityManager.createNativeQuery(SQLString).executeUpdate();
 
 		if (updateRes == 0) {
