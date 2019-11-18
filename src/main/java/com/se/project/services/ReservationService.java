@@ -30,7 +30,7 @@ public class ReservationService {
 
 		String date = (String) body.get("date");
 
-		String[] cols = {"r.rid", "u.firstName", "r.startDate", "r.endDate", "r.noRooms", "r.roomNo", "r.amountPaid", "r.totalAmount", "r.reservationType", "r.checkinTime", "r.checkoutTime"};
+		String[] cols = {"r.rid", "u.firstName", "r.startDate", "r.endDate", "r.noRooms", "r.roomNo", "r.amountPaid", "r.totalAmount", "r.reservationType", "r.checkinTime", "r.checkoutTime", "r.comments", "u.ccNo"};
 
 		String query = "SELECT " + colsToString(cols) + " FROM reservations r INNER JOIN user u ON r.userId = u.userId WHERE startDate <='" + date + "' AND endDate >= '" + date + "' and status='active'";
 		List li = entityManager.createNativeQuery(query).getResultList();
