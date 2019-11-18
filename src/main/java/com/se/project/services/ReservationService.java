@@ -116,6 +116,30 @@ public class ReservationService {
 		return res;
 	}
 
+    @Transactional
+    @PostMapping("/generateBill")
+    public Response generateBill(@RequestBody HashMap body) {
+        Response res = new Response();
+        int rid = (int) body.get("rid");
+        String[] cols = {"r.rId", "r.bookingTime", "r.startDate", "r.endDate", "r.noRooms", "r.roomNo", "r.checkinTime", "r.checkoutTime", "r.amountPaid", "r.totalAmount", "r.reservationType", "u.userId", "u.firstName", "u.lastName", "u.phoneNumber", "u.email", "u.addressLine1", "u.addressLine2", "u.city", "u.state", "u.country", "u.zip"};
+        String query = "SELECT " + colsToString(cols) + " FROM reservations r INNER JOIN user u on r.userId = u.userId where rId ='" + rid + "' and status='active'";
+        List li = entityManager.createNativeQuery(query).getResultList();
+
+        if(li.size() == 0) {
+            res.setData("No data found");
+            return res;
+        }
+        Object[] rs = (Object[]) li.get(0);
+        HashMap hm = new HashMap();
+        int i = 0;
+        for(String s: cols) {
+            hm.put(s.split("\\.")[1], rs[i++]);
+        }
+        res.setSuccess(1);
+        res.setData(hm);
+        return res;
+    }
+
 	@Transactional
 	@PostMapping("/allocateRoom")
 	public Response allocateRoom(@RequestBody HashMap body) {
@@ -558,17 +582,113 @@ public class ReservationService {
 		return res;
 	}
 
+    @Transactional
+    @PostMapping("/expRoomIncome")
+    public Response expRoomIncome(@RequestBody HashMap body) {
+        Response res = new Response();
 
+        LocalDate startDate = LocalDate.parse((String) body.get("date"));
+        LocalDate endDate = startDate.plusDays(30);
 
-	@Transactional
+//        List li = entityManager.createNativeQuery("SELECT COUNT(*) AS count, reservationType, startDate FROM reservations WHERE startDate BETWEEN '" + startDate + "' AND '" + endDate + "' AND endDate BETWEEN '" + startDate + "' AND '" + endDate + "' AND status='active' GROUP BY reservationType, startDate ORDER BY startDate;").getResultList();
+        List li = entityManager.createNativeQuery("SELECT rbr.date, SUM(r.totalAmount/r.noRooms) expectedIncome FROM reservations r INNER JOIN resBaseRates rbr ON r.uid=rbr.uid WHERE rbr.date <'" + endDate + "' AND rbr.date >= '" + startDate + "'\n" +
+                "AND r.status = 'active' GROUP BY rbr.date").getResultList();
+
+        if (li.size() == 0) {
+            res.setData("No data found");
+            return res;
+        }
+
+        List data = new ArrayList();
+        float totalIncome = 0;
+
+        for(Object o: li) {
+            Object[] rs = (Object[]) o;
+            HashMap hm = new HashMap();
+            hm.put("date", rs[0]);
+            hm.put("expectedIncome", rs[1]);
+            totalIncome = totalIncome + Float.parseFloat(rs[1].toString());
+            data.add(hm);
+        }
+
+	    HashMap result = new HashMap();
+        result.put("expectedIncome", data);
+        result.put("totalIncome", totalIncome);
+        result.put("averageIncome", totalIncome/30);
+        res.setSuccess(1);
+        res.setData(result);
+        return res;
+    }
+
+    @Transactional
+    @PostMapping("/getOccupancyReport")
+    public Response getOccupancyReport(@RequestBody HashMap body) {
+        Response res = new Response();
+        LocalDate date = LocalDate.parse((String) body.get("date"));
+        System.out.println("date==="+date);
+        LocalDate prevDate = LocalDate.parse((String) body.get("date")).minusDays(1);
+        System.out.println("prevDate==="+prevDate);
+        String query = "SELECT u.email, u.firstName, u.lastName, r.startDate, r.endDate, (r.startDate <='" + prevDate + "') AS lastEvening, (r.endDate ='" + date + "') AS departsToday FROM reservations r INNER JOIN user u ON u.userId = r.userId WHERE r.checkinTime IS NOT NULL and r.checkoutTime IS NULL AND r.startDate <='" + date + "' AND r.endDate >= '" + date + "' AND r.status='active'";
+        List li = entityManager.createNativeQuery(query).getResultList();
+
+        if(li.size() == 0) {
+            res.setData("No data found");
+            return res;
+        }
+
+        List data = new ArrayList();
+        for(Object o: li) {
+            Object[] rs = (Object[]) o;
+            HashMap hm = new HashMap();
+            int i = 0;
+            hm.put("email", rs[0]);
+            hm.put("firstName", rs[1]);
+            hm.put("lastName", rs[2]);
+            hm.put("statDate", rs[3]);
+            hm.put("endDate", rs[4]);
+            hm.put("lastEvening", rs[5]);
+            hm.put("departsToday", rs[6]);
+            data.add(hm);
+        }
+        res.setSuccess(1);
+        res.setData(data);
+        return res;
+    }
+
+    @Transactional
 	@PostMapping("/incentiveReport")
 	public Response incentiveReport(@RequestBody HashMap body) {
-		Response res = new Response();
+        Response res = new Response();
 
-		LocalDate startDate = LocalDate.parse((String) body.get("date"));
-		LocalDate endDate = startDate.plusDays(30);
+        LocalDate startDate = LocalDate.parse((String) body.get("date"));
+        LocalDate endDate = startDate.plusDays(30);
 
-		return res;
+        List li = entityManager.createNativeQuery("SELECT  rbr.date, SUM((rbr.baseRate * r.noRooms * 0.2)) AS loss FROM `reservations` r INNER JOIN resBaseRates rbr ON rbr.uid = r.uid WHERE r.`reservationType` = 'incentive' AND rbr.date <'" + endDate + "' AND rbr.date >= '" + startDate + "' AND r.status = 'active' GROUP BY rbr.date").getResultList();
+
+        if (li.size() == 0) {
+            res.setData("No data found");
+            return res;
+        }
+
+        List data = new ArrayList();
+        float totalDisc = 0;
+
+        for(Object o: li) {
+            Object[] rs = (Object[]) o;
+            HashMap hm = new HashMap();
+            hm.put("date", rs[0]);
+            hm.put("Incentive Discount", rs[1]);
+            totalDisc = totalDisc + Float.parseFloat(rs[1].toString());
+            data.add(hm);
+        }
+
+        HashMap result = new HashMap();
+        result.put("expectedIncome", data);
+        result.put("totalDiscount", totalDisc);
+        result.put("averageDiscount", totalDisc/30);
+        res.setSuccess(1);
+        res.setData(result);
+        return res;
 	}
 
 
