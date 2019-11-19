@@ -2,12 +2,20 @@ package com.se.project.services;
 
 
 import com.se.project.models.Response;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.math.BigInteger;
@@ -20,6 +28,9 @@ import static java.time.temporal.ChronoUnit.DAYS;
 
 @RestController
 public class ReservationService {
+
+	@Autowired
+	private JavaMailSender javaMailSender;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -57,6 +68,36 @@ public class ReservationService {
 		return res;
 	}
 
+	@Transactional
+	@PostMapping("sendReminder")
+	public Response sendReminder(@RequestBody HashMap body) throws MessagingException {
+		Response response = new Response();
+		int rid = (int) body.get("rId");
+
+		String[] cols = {"r.startDate", "r.endDate", "r.amountPaid", "r.totalAmount", "r.noRooms", "u.firstName", "u.lastName", "u.email"};
+		List li = entityManager.createNativeQuery("SELECT " + colsToString(cols) + " FROM reservations r INNER JOIN user u ON r.userId=u.userId WHERE rId = " + rid).getResultList();
+
+		Object[] obj = (Object[]) li.get(0);
+		HashMap vals = new HashMap();
+		int i = 0;
+		for(String s: cols) vals.put(s.split("\\.")[1], obj[i++]);
+
+		LocalDate localDate = LocalDate.parse((String.valueOf(vals.get("startDate"))));
+		localDate = localDate.minusDays(15);
+
+		MimeMessage msg = javaMailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(msg, true);
+
+		helper.setTo(InternetAddress.parse("pavan1645@gmail.com," + String.valueOf(vals.get("email"))));
+		helper.setSubject("Confirm Your Booking - Ophelia's Oasis");
+		helper.setText("<div style=\"width: 600px; margin: 0 auto; font-family: 'Arial';\"><div style=\"line-height: 1.5; background-color: #f2f2f2; padding: 2rem;\"><strong>Hi " + vals.get("firstName") + " " + vals.get("lastName") + ",</strong><p>Hope you are having an amazing day! <br>This email is a reminder for you to complete the payment of your hotel booking reservation at Ophelia's Oasis.</p><p>Here are your booking details:</p><p>Name: " + vals.get("firstName") + " " + vals.get("lastName") + " <br>Reservation Start Date: " + vals.get("startDate") + " <br>Reservation End Date: " + vals.get("endDate") + " <br>Number of Rooms Booked: " + vals.get("noRooms") + " <br>Total Amount: $" + vals.get("totalAmount") + " <br>Amount Paid: $" + vals.get("amountPaid") + " <br>Amount Payment Deadline: " + localDate.toString() + "</p><p>Please click the below button to complete your payment:</p><a href=\"https://www.google.com\"><button style=\"background-color:#28a745; color:white; border:none; padding: 0.75rem 0px; width: 125px; margin-left:205px; border-radius: 5px; font-size: 1rem;\">PAY NOW</button></a><p style=\"color:grey; line-height: 1\"><small><em>Note: If payment is not done in 15 days, your reservation will be cancelled and no refund will be made.</em></small></p></div><div style=\"background-color: #e3e3e3; padding: 2rem; color: grey; text-align: center; font-size: 12px; line-height: 1.5\"><p>Any problems? Call our 24x7 helpline: 1800-000-0000 <br>&copy; Copyright 2019 - Ophelia's Oasis </p></div></div>", true);
+
+		javaMailSender.send(msg);
+
+		response.setSuccess(1);
+		response.setData(vals);
+		return response;
+	}
 
 	@Transactional
 	@PostMapping("/cancelReservation")
