@@ -329,7 +329,7 @@ public class ReservationService {
 		}
 
 		res.setSuccess(1);
-		res.setData("Allocated room successfully");
+		res.setData("Payment successful.");
 
 		return res;
 	}
@@ -436,8 +436,11 @@ public class ReservationService {
 		i++;
 
 //		set reservation id
+		List l = entityManager.createNativeQuery("SELECT MAX(rId)   + 1 FROM reservations r").getResultList();
+
 		reservationCols[i] = "rId";
-		reservationVals[i] = "(SELECT MAX(rId) FROM reservations r) + 1";
+		reservationVals[i] = String.valueOf(l.get(0));
+		String rid = reservationVals[i];
 		i++;
 
 //		set uid
@@ -487,8 +490,12 @@ public class ReservationService {
 		/* INSERT reservation */
 
 
+		HashMap<String, String> data = new HashMap<>();
+		data.put("message", "Reservation added successfully");
+		data.put("rid", rid);
+
 		res.setSuccess(1);
-		res.setData("Reservation added successfully");
+		res.setData(data);
 
 		return res;
 	}
