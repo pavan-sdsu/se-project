@@ -73,7 +73,7 @@ function reservations(resdate) {
 					if (!element.roomNo) 
 						records += "<input type=\"button\" class =\"btn btn-primary\" value =\"Allocate Room\" onclick=\"openModal('#allocateRoomModal', " + element.noRooms + ", " + element.rid + ")\">";
 					
-					records += "<input type=\"button\" class =\"btn btn-primary\" value =\"Send Reminder\">";
+					if(element.reservationType == "sixtyDays") records += "<input type=\"button\" class =\"btn btn-primary\" value =\"Send Reminder\" onclick='sendReminder(" + element.rid + ")'>";
 
 					if (element.comments != "Penalty charged")
 						records += "<input type='button' class ='btn btn-primary' value ='Charge Penalty' onclick='chargePenaltyModal(\"" + element.reservationType + "\", " + element.rid + ",\"" + element.ccNo + "\")'>";
@@ -235,3 +235,21 @@ function chargePenalty(){
 		}
 	})
 };
+
+function sendReminder(rid) {
+	$.ajax({
+		url: 'https://se532.herokuapp.com/sendReminder',
+		method: 'POST',
+		contentType: 'application/json',
+		dataType: 'json',
+		data: JSON.stringify({
+			'rid': rid
+		}),
+		success: function (data, status) {
+			console.log(data);
+			if (data.success == 0) return console.log('Error', data.message);
+			alert(data.message);
+			reservations(today);
+		}
+	})
+}
