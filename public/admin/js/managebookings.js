@@ -243,7 +243,7 @@ function sendReminder(rid) {
 		contentType: 'application/json',
 		dataType: 'json',
 		data: JSON.stringify({
-			'rid': rid
+			'rId': rid
 		}),
 		success: function (data, status) {
 			console.log(data);
