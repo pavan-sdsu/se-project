@@ -81,30 +81,32 @@
                     <span>Manage Bookings</span>
                 </a>
             </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="billings.html">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>Billings</span></a>
-            </li>
-
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-fw fa-folder"></i>
-                    <span>Reports</span>
-                </a>
-                <div class="dropdown-menu" aria-labelledby="pagesDropdown">
-
-                    <a class="dropdown-item" href="occupancyreport.html">Occupancy Report</a>
-                    <a class="dropdown-item" href="expectedoccreport.html">Expected Occupancy Report</a>
-                    <a class="dropdown-item" href="expectedroomincome.html">Expected Room Income</a>
-                    <a class="dropdown-item" href="incentivereport.html">Incentive Report</a>
-                </div>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="baserate.html">
-                    <i class="fas fa-dollar-sign"></i>
-                    <span>Base Rates</span></a>
+			<li class="nav-item active">
+				<a class="nav-link" href="billings.html">
+					<i class="fas fa-fw fa-table"></i>
+					<span>Billings</span></a>
+				</li>
+				
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown"
+					aria-haspopup="true" aria-expanded="false">
+					<i class="fas fa-fw fa-folder"></i>
+					<span>Reports</span>
+				</a>
+				<div class="dropdown-menu" aria-labelledby="pagesDropdown">
+					
+					<a class="dropdown-item" href="occupancyreport.html">Occupancy Report</a>
+					<a class="dropdown-item" id="exp-occ-item" href="expectedoccreport.html">Expected Occupancy Report</a>
+					<a class="dropdown-item" id="exp-inc-item" href="expectedroomincome.html">Expected Room Income</a>
+					<a class="dropdown-item" id="inc-rep-item" href="incentivereport.html">Incentive Report</a>
+				</div>
+			</li>
+			<li class="nav-item" id="base-rate-item">
+				<a class="nav-link" href="baserate.html">
+					<i class="fas fa-dollar-sign"></i>
+					<span>Base Rates</span>
+				</a>
+			</li> <span>Base Rates</span></a>
             </li>
         </ul>
         <div id="content-wrapper">
@@ -250,7 +252,8 @@
         <script src="js/demo/chart-area-demo.js"></script> -->
     <!-- <script src="https://code.jquery.com/jquery-1.12.4.js"></script> -->
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
+	<script src="./js/common.js"></script>	
     <script src="js/billings.js"></script>
     <script>
         $(function () {

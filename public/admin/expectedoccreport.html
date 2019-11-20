@@ -58,69 +58,70 @@
 					<span>Billings</span></a>
 				</li>
 				
-				<li class="nav-item dropdown active show">
+				<li class="nav-item dropdown show">
 					<a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown"
-					aria-haspopup="true" aria-expanded="false">
+					aria-haspopup="true" aria-expanded="true">
 					<i class="fas fa-fw fa-folder"></i>
 					<span>Reports</span>
 				</a>
-				<div class="dropdown-menu active show" aria-labelledby="pagesDropdown">
+				<div class="dropdown-menu show" aria-labelledby="pagesDropdown">
 					
 					<a class="dropdown-item" href="occupancyreport.html">Occupancy Report</a>
-					<a class="dropdown-item active" href="expectedoccreport.html">Expected Occupancy Report</a>
-					<a class="dropdown-item" href="expectedroomincome.html">Expected Room Income</a>
-					<a class="dropdown-item" href="incentivereport.html">Incentive Report</a>
+					<a class="dropdown-item active" id="exp-occ-item" href="expectedoccreport.html">Expected Occupancy Report</a>
+					<a class="dropdown-item" id="exp-inc-item" href="expectedroomincome.html">Expected Room Income</a>
+					<a class="dropdown-item" id="inc-rep-item" href="incentivereport.html">Incentive Report</a>
 				</div>
 			</li>
-			<li class="nav-item">
+			<li class="nav-item" id="base-rate-item">
 				<a class="nav-link" href="baserate.html">
 					<i class="fas fa-dollar-sign"></i>
-					<span>Base Rates</span></a>
-				</li>
-			</ul>
-			<div id="content-wrapper">
-				<div id="printableArea">
-					<div class="row">
-						<div class="col-9">
-							<h4>Expected Occupancy Report</h4>
-							<span id="avgocc">Average Occupancy : </span>
-						</div>
-						<div class="col-3">
-							<button class="btn btn-success ml-auto" onclick="window.print()">Print Report</button>
-						</div>
+					<span>Base Rates</span>
+				</a>
+			</li>
+		</ul>
+		<div id="content-wrapper">
+			<div id="printableArea">
+				<div class="row">
+					<div class="col-9">
+						<h4>Expected Occupancy Report</h4>
+						<span id="avgocc">Average Occupancy : </span>
 					</div>
-					<table class="table table-striped table-bordered">
-						<thead class="thead-dark">
-							<tr>
-								<th scope="col">Date</th>
-								<th scope="col">Incentive</th>
-								<th scope="col">Conventional</th>
-								<th scope="col">Prepaid</th>
-								<th scope="col">SixtyDays</th>
-							</tr>
-						</thead>
-						<tbody>
-							
-						</tbody>
-					</table>
+					<div class="col-3">
+						<button class="btn btn-success ml-auto" onclick="window.print()">Print Report</button>
+					</div>
 				</div>
-				
-				<canvas id="canvas" class="col-md-6 offset-md-3 mt-5"></canvas>
-				
-				<!-- Sticky Footer -->
-				<footer class="sticky-footer">
-					<div class="container my-auto">
-						<div class="copyright text-center my-auto">
-							<span>Copyright © Your Website 2019</span>
-						</div>
-					</div>
-				</footer>
-				
+				<table class="table table-striped table-bordered">
+					<thead class="thead-dark">
+						<tr>
+							<th scope="col">Date</th>
+							<th scope="col">Incentive</th>
+							<th scope="col">Conventional</th>
+							<th scope="col">Prepaid</th>
+							<th scope="col">SixtyDays</th>
+						</tr>
+					</thead>
+					<tbody>
+						
+					</tbody>
+				</table>
 			</div>
-			<!-- /.content-wrapper -->
+			
+			<canvas id="canvas" class="col-md-6 offset-md-3 mt-5"></canvas>
+			
+			<!-- Sticky Footer -->
+			<footer class="sticky-footer">
+				<div class="container my-auto">
+					<div class="copyright text-center my-auto">
+						<span>Copyright © Your Website 2019</span>
+					</div>
+				</div>
+			</footer>
 			
 		</div>
+		<!-- /.content-wrapper -->
 		
+	</div>
+	
 	
 	<!-- Bootstrap core JavaScript-->
 	<script src="vendor/jquery/jquery.min.js"></script>
@@ -141,6 +142,7 @@
 	<!-- Demo scripts for this page-->
 	<script src="js/demo/datatables-demo.js"></script>
 	<script src="js/demo/chart-area-demo.js"></script>
+	<script src="./js/common.js"></script>
 	<script src="js/expectedoccreport.js"></script>
 	<!-- <script src="https://code.jquery.com/jquery-1.12.4.js"></script> -->
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
