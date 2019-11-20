@@ -47,8 +47,8 @@ function reservations(resdate) {
 					records += "<div class='card-header' id='" + element.rid + index + "' data-toggle='collapse' data-target='#collapse" + element.rid + "' aria-expanded='false' aria-controls='collapse" + element.rid + "'>Reservation ID :" + element.rid + "</div>";
 					records += "<div id='collapse" + element.rid + "' class='collapse border' aria-labelledby='" + element.rid + index + "' data-parent='#accordionExample'><div class='card-body'> First Name: " + element.firstName + " <br> " + "Reservation start date : " + element.startDate + "<br>";
 					records += "Reservation End Date : " + element.endDate + "<br>";
-					records += "Total ammount : $" + element.totalAmount + "<br>";
-					records += "Ammount Paid : $" + element.amountPaid + "<br>";
+					records += "Total amount : $" + element.totalAmount + "<br>";
+					records += "Amount Paid : $" + element.amountPaid + "<br>";
 					records += "Reservation Type : " + element.reservationType + "<br>";
 					if (element.checkinTime !== null) records += "Check In : " + moment(element.checkinTime).format("dddd, MMMM Do YYYY, h:mm:ss a") + "<br>";
 					if (element.checkoutTime !== null) records += "Check Out : " + moment(element.checkoutTime).format("dddd, MMMM Do YYYY, h:mm:ss a") + "<br>";
@@ -75,10 +75,9 @@ function reservations(resdate) {
 					
 					records += "<input type=\"button\" class =\"btn btn-primary\" value =\"Send Reminder\">";
 
-					if (element.comments !== "Penalty charged" && element.amountPaid == 0 )
-						records += "<input type='button' class ='btn btn-primary' value ='Charge Penalty' onclick='chargePenaltyModal('" + element.reservationType + "', " + element.rid + ",'" + element.ccNo + "')'>";
-					else	
-						records += "<input type='button' class ='btn btn-primary' value ='Charge Penalty' onclick='chargePenaltyModal('" + element.reservationType + "', " + element.rid + ",'" + element.ccNo + "')' disabled>";
+					if (element.comments != "Penalty charged")
+						records += "<input type='button' class ='btn btn-primary' value ='Charge Penalty' onclick='chargePenaltyModal(\"" + element.reservationType + "\", " + element.rid + ",\"" + element.ccNo + "\")'>";
+					else records += "<input type='button' class ='btn btn-primary' value ='Charge Penalty' onclick='chargePenaltyModal(\"" + element.reservationType + "\", " + element.rid + ",\"" + element.ccNo + "\")' disabled>";
 
 						records += "</div></div>";
 				});
@@ -111,6 +110,7 @@ function checkInModal(rid) {
 
 $(document).ready(() => {
 	$('#allocateRoomModal').on('shown.bs.modal', function (e) {
+		$("#roomAllocateForm").html("");
 		$.ajax({
 			url: 'https://se532.herokuapp.com/getAvailableRooms',
 			method: 'POST',
@@ -210,28 +210,28 @@ function chargePenaltyModal(resType, rid, ccNu) {
 		$("#ccData").html("No Refund Will be provided");
 		$("#chargePenaltyModal").modal('show');	
 	}
-
-	$("#chargePenalty").click(function(){
-		$.ajax({
-			url: 'https://se532.herokuapp.com/chargePenalty',
-			method: 'POST',
-			contentType: 'application/json',
-			dataType: 'json',
-			data: JSON.stringify({
-				'rid': rid
-			}),
-	
-			success: function (data, status) {
-				if (data.success == 0) return console.log('Error', data.message);
-				$("#chargePenaltyModal .alert-success").removeClass("d-none");
-				$(".card").html("");
-				reservations(today);
-			}
-	
-	
-		})
-	
-	});
+	$("#chargePenalty").attr("data-rid", rid);
 }
 
 
+
+function chargePenalty(){
+	let rid = $("#chargePenalty").data("rid");
+	console.log(rid);
+	$.ajax({
+		url: 'https://se532.herokuapp.com/chargePenalty',
+		method: 'POST',
+		contentType: 'application/json',
+		dataType: 'json',
+		data: JSON.stringify({
+			'rid': rid
+		}),
+
+		success: function (data, status) {
+			if (data.success == 0) return console.log('Error', data.message);
+			$("#chargePenaltyModal .alert-success").removeClass("d-none");
+			$(".card").html("");
+			reservations(today);
+		}
+	})
+};
