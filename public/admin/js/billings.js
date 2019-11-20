@@ -54,9 +54,12 @@ function reservations(endDate) {
 					records += "Room Number : Not Allocated yet" + "<br>";
 					else
 					records += "Room Number : " + element.roomNo + "<br>";
-					
-					records += "<input type=\"button\" class =\"btn btn-primary\" onclick=\"generatebill(" + element.rid + ")\" value =\"Generate Bill \" data-toggle=\"modal\"data-target=\"#generateModal\">";
-					records += "<input type=\"button\" class =\"btn btn-primary\" onclick=\"paybill(" + element.rid + ")\" value =\"Pay Bill\">";
+                    
+                    let genBill = (element.totalAmount == element.amountPaid) ? "" : "disabled";
+                    records += "<input type=\"button\" class =\"btn btn-primary\" onclick=\"generatebill(" + element.rid + ")\" value =\"Generate Bill \" data-toggle=\"modal\"data-target=\"#generateModal\" " + genBill + " >";
+                    
+                    let payBill = (element.totalAmount == element.amountPaid) ? "disabled" : "";
+					records += "<input type=\"button\" class =\"btn btn-primary\" onclick=\"paybill(" + element.rid + ")\" value =\"Pay Bill\" " + payBill + ">";
 					records += "</div></div>";
 					//}
 				});

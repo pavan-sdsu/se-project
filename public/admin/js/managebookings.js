@@ -75,9 +75,12 @@ function reservations(resdate) {
 					
 					records += "<input type=\"button\" class =\"btn btn-primary\" value =\"Send Reminder\">";
 
-					if (element.comments !== "Penalty charged")
+					if (element.comments !== "Penalty charged" && element.amountPaid == 0 )
 						records += "<input type='button' class ='btn btn-primary' value ='Charge Penalty' onclick='chargePenaltyModal('" + element.reservationType + "', " + element.rid + ",'" + element.ccNo + "')'>";
-					records += "</div></div>";
+					else	
+						records += "<input type='button' class ='btn btn-primary' value ='Charge Penalty' onclick='chargePenaltyModal('" + element.reservationType + "', " + element.rid + ",'" + element.ccNo + "')' disabled>";
+
+						records += "</div></div>";
 				});
 				$(".card").append(records);
 			}

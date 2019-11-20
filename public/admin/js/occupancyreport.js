@@ -2,7 +2,7 @@
 $(document).ready(function () {
     var name = window.localStorage.getItem('name');
 var role = window.localStorage.getItem('role');
-$("#role").append("Welcome: " + name + "  Role: " + role);
+$("#role").append("Welcome, " + name);
     var date = new Date();
     var dd = date.getDate();
     var mm = date.getMonth() + 1;
