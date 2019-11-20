@@ -74,7 +74,8 @@ $(document).ready(function () {
                 }),
                 success: function (data, status) {
                     if (data.success === 1) {
-                        $("#updateSuccess").append("Base Rate updated successfully");
+						$("#updateSuccess").append("Base Rate updated successfully");
+						$("#updateSuccess").show();
                         refereshBaseRate();
                     }
                 }
