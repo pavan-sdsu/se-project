@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Homepage for the Bug Slayers' CS532 Software Engineering project">
+  <meta name="author" content="The Bug Slayers">
+
+  <title>Ophelia's Oasis - Homepage</title>
+
+
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/BugSlayers.css" rel="stylesheet">
+
+  <!-- fonts -->
+  
+  <link href="fonts/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://momentjs.com/downloads/moment.js"></script>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"> -->
+  <script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
+  <link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body id="page-top">
+
+  <!----------------------------------------------------------------------------------------------------------------------------------------->
+  <!-----------------------------------------------------------HEADER------------------------------------------------------------------------>
+  <!----------------------------------------------------------------------------------------------------------------------------------------->
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+    <div class="container">
+      <a class="navbar-brand js-scroll-trigger" href="#page-top">Ophelia's Oasis</a>
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        Menu
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="#about">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="#book_dates">Book Now</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="#">Manage Booking</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!----------------------------------------------------------------------------------------------------------------------------------------->
+  <!-------------------------------------------------------Landing Page---------------------------------------------------------------------->
+  <!----------------------------------------------------------------------------------------------------------------------------------------->
+  <header class="masthead">
+    <div style="height: 85% !important;" class="container d-flex h-100 align-items-center">
+      <div class="mx-auto text-center">
+        <h1 class="mx-auto my-0 text-uppercase">Ophelia's Oasis</h1>
+        <h2 class="text-white-50 mx-auto mt-2 mb-5">Simply a place to get away.</h2>
+      </div>
+    </div>
+
+    <div class="container d-flex align-items-center">
+      <div class="container">
+        <div class="row">
+          <div class="button_containter hmpg_button"><a href="#" class="btn btn-primary js-scroll-trigger button_booking">Manage Booking</a></div>
+          <div class="button_containter hmpg_button"><a href="#book_dates" class="btn btn-primary js-scroll-trigger button_booking">Book Now</a></div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="container d-flex align-items-center">
+      <div style="width:100%" class="mx-auto text-center">
+        <div class="button_containter"><a href="#" class="btn btn-primary js-scroll-trigger button_booking" onclick="location.href='bookandpay2.html'">Manage Booking</a></div>
+        <div class="button_containter"><a href="#book_dates" class="btn btn-primary js-scroll-trigger button_booking">Book Now</a></div>
+      </div>
+    </div> -->
+
+  </header>
+
+  <!----------------------------------------------------------------------------------------------------------------------------------------->
+  <!---------------------------------------------------------LEARN MORE---------------------------------------------------------------------->
+  <!----------------------------------------------------------------------------------------------------------------------------------------->
+
+  <section id="about" class="about-section text-center">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 mx-auto">
+          <h2 class="text-white mb-4">About Ophelia’s Oasis</h2>
+          <p class="text-white-50">Ophelia's Oasis is a 45-room hotel situated on the top of a mountain overlooking the most beautiful part of the Amlet Desert in Australia. Every room has an uninterrupted view of the desert sketching to the horizon some 15 or 20 miles away.</div>
+      </div>
+      <img style="max-width: 40%;" src="img/cactus2.png" class="img-fluid" alt="">
+    </div>
+  </section>
+
+
+  <!----------------------------------------------------------------------------------------------------------------------------------------->
+  <!-----------------------------------------------------------BOOK NOW---------------------------------------------------------------------->
+  <!----------------------------------------------------------------------------------------------------------------------------------------->
+
+<section id="book_dates" class="projects-section bg-light">
+   <div class="container d-flex h-100 align-items-center">
+      <div class="container">
+         
+
+         <!-- calendar row -->
+         <div class="row">
+            <div class="one_half mb-3 mb-md-0">
+               <div class="py-4 h-100">
+                  <div>
+                     <p style="padding-left: 0.2rem;">Start Date</p>
+                     <input id="datepicker" width="270" placeholder="dd/mm/yyy" />
+                  </div>
+               </div>
+            </div>
+            <div class="one_half mb-3 mb-md-0">
+               <div class="py-4 h-100">
+                  <div>
+                     <p style="padding-left: 0.2rem;">End Date</p>
+                     <input id="datepicker2" width="270" placeholder="dd/mm/yyy" />
+                  </div>
+               </div>
+            </div>
+            <script>
+              $('#datepicker').datepicker({
+                uiLibrary: 'bootstrap'
+              });
+              $('#datepicker2').datepicker({
+                uiLibrary: 'bootstrap'
+              });
+            </script>
+         </div>
+         
+         <!-- slider row -->
+         <div class="row" id="slider_rows">
+            <p style="font-size: 1.15rem;">Number of rooms</p>
+            <div class="slidecontainer">
+               <input type="range" min="1" max="45" value="1" class="slider" id="myRange">
+               <p>Number of rooms selected: <span id="demo"></span></p>
+            </div>
+            <script>
+               var slider = document.getElementById("myRange");
+               var output = document.getElementById("demo");
+               output.innerHTML = slider.value;
+               slider.oninput = function() {
+                 output.innerHTML = this.value
+               }
+            </script>
+         </div>
+         <!-- payment option row -->
+         <div class="row" style="margin-top: 5rem;">
+            <div class="col-md-4 mb-3 mb-md-0">
+               <div class="card py-4 h-100" style="background: linear-gradient(45deg, #e3ecec, #ee9ca700);">
+                  <div class="to_chg_chck card-body text-center" style="background: none">
+                     <div>
+                        <label class="container_checklist text-uppercase text_bold">PrePaid Reservation
+                        <input id="checkbox1" type="checkbox" checked="checked">
+                        <span class="checkmark"></span>
+                        </label>
+                     </div>
+                     <hr class="my-4">
+                     <p class="m-0">Save 25%. Pay full amount at least 90 days prior reservation start date. The reservation can be changed (subject to avaibility).</p>
+                  </div>
+               </div>
+            </div>
+            <div class="col-md-4 mb-3 mb-md-0">
+               <div class="to_chg_chck card py-4 h-100">
+                  <div class="card-body text-center">
+                     <div>
+                        <label class="container_checklist text-uppercase text_bold">60-days-in-advance reservation
+                        <input id="checkbox2" type="checkbox">
+                        <span class="checkmark"></span>
+                        </label>
+                     </div>
+                     <hr class="my-4">
+                     <p class="m-0">Save 15%. Pay full amount 30 days prior reservation start date. The reservation can be changed (subject to avaibility).</p>
+                  </div>
+               </div>
+            </div>
+            <div class="col-md-4 mb-3 mb-md-0">
+               <div class="to_chg_chck card py-4 h-100">
+                  <div class="card-body text-center">
+                     <div>
+                        <label class="container_checklist text-uppercase text_bold">Conventional
+                        <input  id="checkbox3"  type="checkbox">
+                        <span class="checkmark"></span>
+                        </label>
+                     </div>
+                     <hr class="my-4">
+                     <p class="m-0">Pay full amount after your stay. No show and cancellation penalties may apply.</p>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         <!-- checkout button -->
+         <div class="row" style="margin-top: 3rem; text-align: center;">
+          <button class="button_checkout"onclick="checkout()"><span>Check Out </span></button>
+         </div>
+
+
+
+
+
+
+
+      </div>
+   </div>
+</section>
+
+
+
+
+  <!----------------------------------------------------------------------------------------------------------------------------------------->
+  <!-----------------------------------------------------------FOOTNOTE---------------------------------------------------------------------->
+  <!----------------------------------------------------------------------------------------------------------------------------------------->
+
+  <!-- Contact Section -->
+  <section id="footnote" class="contact-section bg-black">
+    <div class="container">
+
+      <div class="row">
+      <div style="margin: 0.5rem auto 0 auto;" class="social d-flex justify-content-center">
+        <!-- <a href="#" class="mx-2">
+          <i class="fab fa-twitter"></i>
+        </a>
+        <a href="#" class="mx-2">
+          <i class="fab fa-facebook-f"></i>
+        </a> -->
+        <a href="https://github.com/pavan-sdsu/se-project" class="mx-2">
+          <i class="fab fa-github"></i>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-grey small text-center text-white-50">
+    <div class="container">
+      <p>Created for Software Engineering (CS532) at San Diego State University 2019</p>
+      <p style="margin:0;">Group Members:</p>
+      <p>Levan Badzgaradze | Harsh Javia<br>Ekaterine Kvaghinidze | Pavankumar Mahadik<br>Nadeem Masani | Ronak Thakkar</p>
+    </div>
+  </footer>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Plugin JavaScript -->
+  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+  <!-- Custom scripts for this template -->
+  <script src="js/grayscale.min.js"></script>
+
+  <script>
+    function checkout(){
+        localStorage.setItem("checkin",$("#datepicker").val()); 
+        localStorage.setItem("checkout", $("#datepicker2").val()); 
+        localStorage.setItem("noRooms",$("#myRange").val());
+        if(document.getElementById("checkbox1").checked ==true){
+          localStorage.setItem("reservationType","prepaid");
+          location.href="bookandpay.html";
+        }
+        else
+        if(document.getElementById("checkbox2").checked ==true){
+          localStorage.setItem("reservationType","sixtyDaysAdv");
+          location.href="book.html";
+        }
+          else
+        if(document.getElementById("checkbox3").checked ==true){
+          localStorage.setItem("reservationType","sixtyDaysAdv");
+          location.href="bookandpay.html";
+        }
+
+        console.log(localStorage.getItem("checkin"),"checkin" );
+        console.log(localStorage.getItem("checkout"),"checkout" );
+        console.log(localStorage.getItem("noRooms"),"noRooms" );
+        console.log(localStorage.getItem("reservationType"),"reservationType" );
+
+
+        //localStorage.setItem("reservationType", ); 
+
+        //location.her=
+    }
+  </script>
+</body>
+
+</html>

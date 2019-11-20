@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Form-v10 by Colorlib</title>
+  <!-- Mobile Specific Metas -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <!--Font-->
+   <link rel="stylesheet" type="text/css" href="css/montserrat-font.css">
+  <link rel="stylesheet" type="text/css" href="fonts/material-design-iconic-font/css/material-design-iconic-font.min.css">
+  <!-- Main Style Css -->
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://momentjs.com/downloads/moment.js"></script>
+    <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body class="form-v10">
+  <div class="page-content">
+    <div class="form-v10-content">
+      <div class="review-reservation">
+
+        <center><h1>Reservation Details</h1></center>
+        <div class="form-detail" >
+          <div class="form-group">
+            <div class="form-row form-row-1">
+              Checkin Date
+              <input type="text" class="checkin" id="checkin" placeholder='2019-20-13' readonly>
+            </div>
+            <div class="form-row form-row-2">
+              Checkout Date
+              <input type="text" name="checkout" class="checkout" id="checkout" placeholder="2019-20-13" readonly>
+            </div>
+            <div class="form-row form-row-3">
+              No. of Rooms
+              <input type="text" name="rooms" class="rooms" id="rooms" placeholder="2" readonly>
+            </div>
+            <div class="form-row form-row-4">
+              Reservation Type
+              <input type="text" name="reservationType" class="reservationType" id="reservationType" placeholder="Prepaid" readonly>
+            </div>
+            
+          </div>
+
+        </div>
+        <hr>
+        <div class="form-row">
+          <text style='display: block;'>Total Due</text>
+          <input type="text" name="checkout" class="checkout" id="checkout" placeholder="$100" readonly>
+        </div>
+      </div>
+      <form class="form-detail" action="#" method="post" id="myform">
+
+        <div class="form-left">
+          <h2>General Infomation</h2>
+          
+          <div class="form-row">
+            <input type="text" name="first_name" id="first_name" class="input-text" placeholder="First Name" required>
+          </div>
+          <div class="form-row form-row-1">
+            <input type="text" name="last_name" id="last_name" class="input-text" placeholder="Last Name" required>
+          </div>
+          <div class="form-row form-row-1">
+            <input type="text" name="phone_number" id="phone_number" class="input-text" placeholder="Phone Number" required>
+          </div>
+          <div class="form-row form-row-1">
+            <input type="text" name="email" id="email" class="input-text" placeholder="Email" required>
+          </div>
+          <div class="form-group">
+            <div class="form-row form-row-1">
+              <input type="text" name="birthday" id="birthday" class="input-text" placeholder="Birthday YYYY-MM-DD"crequired>
+            </div>
+          </div>
+
+          <div class="form-row-last">
+            <input name="register" class="register" value="Back" onclick="location.href='index.html'">
+          </div>
+        </div>
+        <div class="form-right">
+          <h2>Payment Information</h2>
+          <div class="form-row">
+            <input type="text" name="credit_card" class="street" id="credit_card" placeholder="Card Number" required>
+          </div>
+          <div class="form-row">
+            <input type="text" name="street" class="street" id="street1" placeholder="Address Line 1" required>
+          </div>
+          <div class="form-row">
+            <input type="text" name="street" class="street" id="street2" placeholder="Address Line 2">
+          </div>
+          <div class="form-group">
+            <div class="form-row form-row-1">
+              <input type="text" name="zip" class="zip" id="zip" placeholder="Zip Code" required>
+            </div>
+            <div class="form-row form-row-2">
+              <input type="text" name="city" class="city" id="city" placeholder="City" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-row form-row-1">
+              <input type="text" name="state" class="state" id="state" placeholder="State">
+            </div>
+            <div class="form-row form-row-2">
+              <input type="text" name="county" class="county" id="county" placeholder="County" required>
+            </div>
+          </div>
+          <div class="form-row-last">
+            <input name="register" class="register" value="Book for $100" onclick='bookAndPay(1,"2019-10-13","2019-10-13","prepaid","2","100")'>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+    function bookAndPay(pay,startDate,endDate,reservationType,noRooms,totalAmount){
+          var amountPaid=0;
+          if(reservationType=="prepaid") amountPaid=totalAmount;
+          console.log(amountPaid,"aa");
+          var first_name = $("#first_name").val();
+          var last_name = $("#last_name").val();
+          var phone_number = $("#phone_number").val();
+          var email = $("#email").val();
+          var birthday = $("#birthday").val();
+
+          if(pay){
+            var credit_card = $("#credit_card").val();
+            var street1 = $("#street1").val();
+            var street2 = $("#street2").val();
+            var zip = $("#zip").val();
+            var city = $("#city").val();
+            var state = $("#state").val();
+            var county = $("#county").val();
+          }
+          else{
+            var credit_card = "";
+            var street1 = "";
+            var street2 = "";
+            var zip = "";
+            var city = "";
+            var state = "";
+            var country = "";
+          }
+
+          
+
+          if(!first_name.match(/^[A-Za-z]+$/)) alert("Please Enter Valid First Name");
+          else
+          if(!last_name.match(/^[A-Za-z]+$/)) alert("Please Enter Valid Last Name");
+          else
+          if(!phone_number.match(/^\+?([0-9]{5,})+$/)) alert("Please Enter Valid Phone Number");
+          else
+          if(!email.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) alert("Please Enter Valid Email");
+          else
+          if(!moment(birthday, 'YYYY-MM-DD',true).isValid()) alert("Please Enter Valid Date in 'YYYY-MM-DD' format");
+          else
+          if(pay && !credit_card.match(/^([0-9]{13,})+$/)) alert("Please Enter Credit Card Number");
+          else
+          if(pay && !street1.match(/^[A-Za-z0-9'\.\-\#\s\,]+$/)) alert("Please Enter validAddress");
+          else
+            if(pay && !city.match(/^[A-Za-z]+$/)) alert("Please Enter Valid City");
+          else
+            if(pay && !state.match(/^[A-Za-z]*$/)) alert("Please Enter Valid State");
+          else
+            if(pay && !county.match(/^[A-Za-z]+$/)) alert("Please Enter Valid County");
+          else
+            $.ajax({
+                url: 'https://se532.herokuapp.com/checkout',
+                method: 'POST',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify({
+                    
+                      "user": {
+                        "zip": zip,
+                        "lastName": last_name,
+                        "country": country,
+                        "city": city,
+                        "ccNo": credit_card,
+                        "firstName": first_name,
+                        "phoneNumber": phone_number,
+                        "dob": birthday,
+                        "addressLine1": street1,
+                        "addressLine2": street2,
+                        "state": state,
+                        "email": email
+                      },
+                      "reservation": {
+                        "startDate": "2019-10-14",
+                        "endDate": "2019-10-14",
+                        "reservationType": "prepaid",
+                        "noRooms": noRooms,
+                        "amountPaid": amountPaid,
+                        "totalAmount": totalAmount
+                      }
+                }),
+                success: function (data, status) {
+                  alert(data.success,'successsss');
+
+                    if (data.success === 1) {
+                      //Change to ResID
+                        location.href='bookingCompleted.html?form='+data.success;
+                    }
+                    else{
+                      alert('Error Occured During Booking Please Try Again');
+                    }
+                }
+            })
+      }
+    
+  </script>
+</body><!-- This templates was made by Colorlib (https://colorlib.com) -->
+</html>
