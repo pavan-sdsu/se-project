@@ -238,7 +238,7 @@ function chargePenalty(){
 
 function sendReminder(rid) {
 	$.ajax({
-		url: 'https://se532.herokuapp.com/sendReminder',
+		url: 'http://localhost:8080/sendReminder',
 		method: 'POST',
 		contentType: 'application/json',
 		dataType: 'json',
