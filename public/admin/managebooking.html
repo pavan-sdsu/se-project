@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<title>SB Admin - Dashboard</title>
+
+	<!-- Custom fonts for this template-->
+
+
+	<link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+
+	<!-- Page level plugin CSS-->
+	<link href="vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
+
+	<!-- Custom styles for this template-->
+	<link href="css/sb-admin.css" rel="stylesheet">
+	<link href="css/common.css" rel="stylesheet">
+	<style>
+		#accordionExample input {
+			float: right;
+			margin: 5px;
+		}
+
+		.alert {
+			padding: 20px;
+			background-color: #f44336;
+			/* Red */
+			color: white;
+			margin-bottom: 15px;
+		}
+
+		/* The close button */
+		.closebtn {
+			margin-left: 15px;
+			color: white;
+			font-weight: bold;
+			float: right;
+			font-size: 22px;
+			line-height: 20px;
+			cursor: pointer;
+			transition: 0.3s;
+		}
+
+		/* When moving the mouse over the close button */
+		.closebtn:hover {
+			color: black;
+		}
+
+		#roomAllocateForm .form-check-label {
+			border-radius: 50px;
+			width: 50px;
+			padding: 4px 0px;
+			margin: 8px 0px;
+			text-align: center;
+			cursor: pointer;
+		}
+
+		#roomAllocateForm .form-check-input:checked~.form-check-label {
+			background-color: #007bff;
+			color: white;
+		}
+
+		#roomAllocateForm .form-check-input {
+			display: none;
+		}
+
+		.card {
+			border: none;
+		}
+
+		#regDate {
+			margin-left: 5px;
+			padding-bottom: 9px;
+			height: 36px;
+
+		}
+
+		#nodatealert {
+			border-radius: 0%;
+			margin: 1%;
+			height: 50px;
+			width: 430px;
+		}
+	</style>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+</head>
+
+<body id="page-top">
+
+	<nav class="navbar navbar-expand navbar-dark bg-dark static-top">
+
+		<a class="navbar-brand mr-1" href="managebooking.html">Ophelia's Oasis</a>
+
+		<button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
+			<i class="fas fa-bars"></i>
+		</button>
+
+
+		<span class="ml-auto text-white" id="role"></span>
+		<a href="/login.html" onclick="logout()" class="fas fa-sign-out-alt text-white ml-3"></a>
+
+	</nav>
+
+	<div id="wrapper">
+
+		<!-- Sidebar -->
+		<ul class="sidebar navbar-nav">
+			<li class="nav-item active">
+				<a class="nav-link" href="managebooking.html">
+					<i class="fas fa-tasks"></i>
+					<span>Manage Bookings</span>
+				</a>
+			</li>
+
+			<li class="nav-item">
+				<a class="nav-link" href="billings.html">
+					<i class="fas fa-fw fa-table"></i>
+					<span>Billings</span></a>
+			</li>
+
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown"
+					aria-haspopup="true" aria-expanded="false">
+					<i class="fas fa-fw fa-folder"></i>
+					<span>Reports</span>
+				</a>
+				<div class="dropdown-menu" aria-labelledby="pagesDropdown">
+
+					<a class="dropdown-item" href="occupancyreport.html">Occupancy Report</a>
+					<a class="dropdown-item" href="expectedoccreport.html">Expected Occupancy Report</a>
+					<a class="dropdown-item" href="expectedroomincome.html">Expected Room Income</a>
+					<a class="dropdown-item" href="incentivereport.html">Incentive Report</a>
+				</div>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="baserate.html">
+					<i class="fas fa-dollar-sign"></i>
+					<span>Base Rates</span></a>
+			</li>
+		</ul>
+		<div id="content-wrapper">
+			<h4>Manage Bookings</h4>
+			<label for="regDate">Select Date:</label>
+			<input type="text" id="regDate">
+			<button type="submit" class="btn btn-primary" id="getReg-btn" style="margin-left: 10px;"> Get Reservations
+			</button>
+			<hr>
+
+			<div class="alert alert-warnings" role="alert" id="nobookingalert" style="display: none;">
+				No Bookings found
+			</div>
+
+
+			<div class="accordion" id="accordionExample">
+				<div class="card" id="card-id">
+				</div>
+			</div>
+
+			<!-- Sticky Footer -->
+			<footer class="sticky-footer">
+				<div class="container my-auto">
+					<div class="copyright text-center my-auto">
+						<span>Copyright © Your Website 2019</span>
+					</div>
+				</div>
+			</footer>
+
+		</div>
+		<!-- /.content-wrapper -->
+
+	</div>
+
+	<!-- /#wrapper -->
+
+	<!-- Scroll to Top Button-->
+	<a class="scroll-to-top rounded" href="#page-top">
+		<i class="fas fa-angle-up"></i>
+	</a>
+
+	<!-- Modal Allocate Room -->
+	<div class="modal fade" id="allocateRoomModal" tabindex="-1" role="dialog" aria-labelledby="allocateRoomLabel"
+		aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="allocateRoomLabel">Select Rooms to be Allocated</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					Select Room Numbers:
+					<form id="roomAllocateForm" data-room-count="" data-rid=""></form>
+					<div class="alert-danger d-none p-3" role="alert"></div>
+					<div class="alert-success d-none p-3" role="alert">Room Allocated Successfully!</div>
+				</div>
+				<div class="modal-footer">
+					<input type="submit" form="roomAllocateForm" class="btn btn-primary" value="Save changes" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Modal Check In -->
+	<div class="modal fade" id="checkInModal" tabindex="-1" role="dialog" aria-labelledby="checkInLabel"
+		aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="checkInLabel"><i class="fas fa-check-circle"></i> Checked In
+						Successfully</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal Check Out -->
+
+	<div class="modal fade" id="checkoutModal" tabindex="-1" role="dialog" aria-labelledby="checkOutLabel"
+		aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="checkOutLabel"><i class="fas fa-check-circle"></i> Checked Out
+						Successfully</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal Charge Penalty -->
+
+		<div class="modal fade" id="chargePenaltyModal" tabindex="-1" role="dialog" aria-labelledby="chargePenaltyLabel"
+		aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="chargePenaltyLabel">Charge Penalty</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<span id ="ccData"></span>
+					<div class="alert-success d-none p-3" role="alert"> Penalty Charged </div>
+
+				</div>
+				<div class="modal-footer">
+					<input type="submit" id="chargePenalty" class="btn btn-primary" value="Charge Penalty" />
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	<!-- Bootstrap core JavaScript-->
+	<script src="vendor/jquery/jquery.min.js"></script>
+	<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+	<!-- Core plugin JavaScript-->
+	<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+	<!-- Page level plugin JavaScript-->
+	<script src="vendor/chart.js/Chart.min.js"></script>
+	<script src="vendor/datatables/jquery.dataTables.js"></script>
+	<script src="vendor/datatables/dataTables.bootstrap4.js"></script>
+
+
+	<!-- Custom scripts for all pages-->
+	<script src="js/sb-admin.min.js"></script>
+
+	<!-- Demo scripts for this page-->
+	<!-- <script src="js/demo/datatables-demo.js"></script>
+			<script src="js/demo/chart-area-demo.js"></script> -->
+	<!-- <script src="https://code.jquery.com/jquery-1.12.4.js"></script> -->
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
+	<script src="js/managebookings.js"></script>
+	<script>
+		$(function () {
+			$("#regDate").datepicker({ dateFormat: 'yy-mm-dd' });
+		});
+
+
+	</script>
+
+</body>
+
+</html>

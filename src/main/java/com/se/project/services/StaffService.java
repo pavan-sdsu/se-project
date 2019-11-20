@@ -27,8 +27,8 @@ public class StaffService {
 	@PersistenceContext
 	EntityManager entityManager;
 
-	@GetMapping("/")
-	public String index() { return "Hello World"; }
+//	@GetMapping("/")
+//	public String index() { return "Hello World"; }
 
 	@PostMapping("/login")
 	public Response login(@RequestBody HashMap creds) throws NoSuchAlgorithmException {
